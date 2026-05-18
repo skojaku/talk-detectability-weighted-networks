@@ -1,0 +1,776 @@
+\documentclass[a4paper,pre,superscriptaddress,floatfix,nofootinbib,twocolumn]{revtex4-1}
+
+\usepackage{bbm}
+\usepackage[pdftex]{graphicx}
+\usepackage{latexsym,amsmath,verbatim,amssymb,txfonts, mathtools}
+\usepackage{color}
+\usepackage{rotating}
+\usepackage{verbatim}
+\usepackage{multirow}
+\usepackage[english]{babel}
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage[normalem]{ulem}
+\usepackage{tabularx}
+
+
+
+\begin{document}
+
+
+\title{Detectability threshold in weighted modular networks}
+
+
+
+\author{Filippo Radicchi}
+\affiliation{Center for Complex Networks and Systems Research, Luddy School
+  of Informatics, Computing, and Engineering, Indiana University, Bloomington,
+  Indiana 47408, USA}
+  \email{f.radicchi@gmail.com}
+
+  \author{...}
+
+
+\begin{abstract}
+We study community detection in networks generated according to a weighted version of the planted-partition model, and
+provide an analytical prediction for the maximum level of mixing allowed to detect the ground-truth communities in the model. We show that
+such a detectability threshold depends on the first two moments of the degree and edge weight distributions in a non-trivial manner.
+We specifically compare the cases where edge weights are distributed according to the Dirac, Poisson and exponential distributions. We find that communities in networks with Dirac distributed weights are the easiest to be detected, as the detectability threshold assumes the smallest value possible; exponentially distributed weights make instead the detection of communities a factor $\sqrt{2}$ harder than for Dirac distributed weights. If weights are distributed according to the Poisson distribution, the difficulty of retrieving the ground-truth community structure of the graph depends on the average value of such a distribution. For low average values of the edge weights, communities are more difficult to be retrieved than in networks with exponentially distributed weights, however, as the average value of the distributions increases then the detectability threshold in networks with edge weights obeying the Poisson distribution asymptotically approaches the one valid for networks with Dirac distributed edge weights.
+\end{abstract}
+
+
+
+
+\maketitle
+
+\section*{Introduction}
+
+Many real networks display a mesoscopic organization
+in modules or clusters often referred to as communities~\cite{fortunato2010community}. A
+community is roughly defined as a subgroup of nodes with a
+density of within-community connections
+larger than the density of cross-community links.
+%A pletora of community detection algorithms exist in the literature,
+%each algorithm relying on a different mechanism for the detection clusters.
+The relative number of within- and cross-cluster edges determines the level of mixing of the
+network. If mixing is small enough, clusters are
+sufficiently well separated one from the other to allow for some level of detection, however,
+clusters are no longer identifiable if mixing exceeds the so-called
+detectability threshold~\cite{reichardt2008detectable, decelle2011inference}.
+The existence of two regimes of detectability of network modular structure
+has been proven for several types of community detection algorithms, including
+spectral clustering methods~\cite{nadakuditi2012graph, radicchi2013detectability, krzakala2013spectral, chen2015universal},
+modularity-maximization-based methods~\cite{radicchi2014paradox},
+as well as deep-learning-aided methods~\cite{kojaku2024network}.
+These findings are backed up by
+formal information-theoretic derivations of the detectability threshold~\cite{abbe2015community, abbe2016crossing, abbe2018community}.
+The standard setting where the problem has been investigated is the one of
+planted-partition model (PPM)~\cite{condon2001algorithms}
+composed of two communities of equal size
+where within- and cross-cluster degrees of individual nodes are random variates extracted
+from Poisson distributions with average
+values respectively equal to $\kappa_\text{in}$ and $\kappa_\text{out}$.
+One naively would expect communities to be detectable as long as
+$\kappa_\text{in} - \kappa_\text{out} > 0$; instead, better-than-random
+detection is possible only
+if $\kappa_\text{in} - \kappa_\text{out} > \sqrt{\kappa_\text{in} + \kappa_\text{out}}$~\cite{decelle2011inference}.
+The problem of community detectability has been studied also under other settings, for example PPMs with different types of degree distributions~\cite{radicchi2013detectability},
+different community size and number~\cite{decelle2011inference, abbe2016crossing}, non-null levels of correlation among the within- and cross-cluster degrees~\cite{radicchi2014paradox}
+and hierarchical community structure~\cite{peel2024detectability}, just to mention a few of them.
+The general message from all these investigations is that the value of the detectability threshold
+may dramatically change from network to network, however, there is no algorithm that can
+perform better than random guessing when the level of mixing is greater than the
+network-specific threshold value.
+
+The goal of the present paper is to generalize the problem of community detectability to networks with weighted edges.
+The fact that this specific problem has not been yet considered so far is somehow surprising given that community detection
+in weighted graphs has been the focus on a large body of papers, see for example~\cite{Ref}.
+We consider a variant of the PPM model where within- and cross-cluster edges still obey
+Poisson distributions with average values given by $\kappa_\text{in}$ and $\kappa_\text{out}$, respectively, but they
+are also opportunely weighted by random variates extracted from distributions with average values equal to $\omega_\text{in}$ and $\omega_\text{out}$, respectively. We derive closed-form expressions for the detectability thresholds when weights are random variables obeying either the Dirac, the Poisson
+or the exponential distributions. For the Dirac distribution, we recover the standard result valid for the unweighted PPM. This is also the easiest setting to retrieve community structure as the detectability threshold assumes the smallest value possible. When weights are distributed according to the exponential distribution, the threshold is always a factor $\sqrt{2}$ larger than for the case of the Dirac distribution. Edge weights obeying the Poisson distribution lead to a highly variable detectability threshold: for small values of  $\omega_\text{in} + \omega_\text{out}$ the threshold is the largest displayed by the three weight distributions we study in this paper, however, as  $\omega_\text{in} + \omega_\text{out}$ grows the threshold approaches the one valid for weights obeying the Dirac distribution. All these results are derived when
+clusters are identified by means spectral optimization of the modularity function, however, we believe that they extend to
+arbitrary methods for the detection of communities in weighted networks.
+
+
+
+\section*{Methods}
+
+\subsection*{Weighted planted-partition model}
+
+We consider networks generated according to a planted-partition model (PPM) with two blocks containing $N$ nodes each~\cite{condon2001algorithms}. We refer to these blocks as ground-truth communities or clusters. Without loss of generality, we label with $i=1, \ldots, N$ the nodes in the first community, and with $i=N+1, \ldots, 2N$ the nodes in the second community.  Weighted connections among pairs of nodes are generated with a two-step procedure:
+
+\begin{enumerate}
+    \item Each node is assigned with a within-cluster or internal degree $k_\text{in}$  and a cross-cluster or external degree $k_\text{out}$. $k_\text{in}$ and $k_\text{out}$ are random integers extracted from the probability distributions
+    $K_\text{in}$ and $K_\text{out}$, respectively.
+    $k_\text{in}$ denotes the number of edges shared by the node with other nodes within the same community, whereas $k_\text{out}$ quantifies the number of edges shared by the node with other nodes in the other community.
+    Edges between pairs of nodes are then created according to the same rules as of the configuration model by simply placing random connections between pairs of nodes with the only constraint of preserving their pre-assigned $k_\text{in}$ and $k_\text{out}$ values~\cite{molloy1995critical}.
+
+    \item Each edge $(i,j)$ created at point 1 is associated with a weight $w_{ij}$ extracted from the probability $W_\text{in}$ if $i$ and $j$ are in the same community, or extracted from the probability $W_\text{out}$ if $i$ and $j$ are in different communities.
+\end{enumerate}
+
+In the above model, the within-cluster strength of a generic node, i.e., the sum of the weights of all connections shared by that node with other nodes within its own community, obeys the distribution
+\begin{equation}
+    S_\text{in} (s) =
+    \sum_{k}  K_\text{in}(k)  \sum_{w_1 + w_2 + \ldots + w_k = s}  W_\text{in}(w_1)  W_\text{in}(w_2) \cdots W_\text{in}(w_k) \; ,
+    \label{eq:conv1}
+\end{equation}
+where we used the fact that edge weights are independent and identically distributed random variables. A similar expression holds for the distribution $S_\text{out}$.
+%Similarly, we have
+%\[
+%S_\text{out} (s) = \sum_{k=0}^{N} \, K_\text{out}(k) \, \sum_{w_1 + w_2 + \ldots + w_k = s} \, W_\text{out}(w_1) \, W_\text{out}(w_2) \cdots W_\text{out}(w_k) \; .
+%\]
+Also, the distribution of the difference between the within- and cross-cluster strengths of the nodes, respectively defined as the sum of the weights of all edges towards nodes within the same community or towards nodes in the other community, is given by the convolution
+\begin{equation}
+D(\Delta_s) = \sum_{s_\text{in} - s_\text{out} = \Delta_s} \,  S_\text{in} (s_\text{in}) \, S_\text{out} (s_\text{out}) \; .
+\label{eq:conv2}
+\end{equation}
+
+
+\subsection*{Community detection via spectral optimization of the modularity function}
+
+We focus our attention on the best bi-partition that can recovered by means of spectral modularity optimization~\cite{newman2006modularity}. According to this method, community structure can be retrieved by looking at the principal eigen-pair $(\lambda, \mathbf{v})$ of the modularity matrix. We quantify the ability of the method to retrieve the ground-truth community structure in instances of the weighted PPM using the order parameter
+\begin{equation}
+P = \frac{1}{\sqrt{2N}}  \left|\sum_{i=1}^{N} v_i \right|  + \frac{1}{\sqrt{2N}}  \left|\sum_{i=N+1}^{2N} v_i \right|   \; .
+    \label{eq:order}
+\end{equation}
+$P$ is the normalized sum of the within-cluster components of the principal eigenvector; we expect these components to have coherent signs when clusters are detectable, and random signs otherwise. The pre-factor $1/\sqrt{2N}$ arises from the normalization of the eigenvector $\mathbf{v}$ and serves to set $0 \leq P \leq 1$. Values of $P > 0$ denote that the method can be, at least partially, retrieve the ground-truth partition of the network; we expect instead $P \simeq 0$ if clusters are not detectable.
+
+
+In the detectability regime, we know that the largest eigenvalue $\lambda$ of the modularity matrix is well approximated by
+\begin{equation}
+\lambda = \frac{\langle \Delta_s^2 \rangle}{\langle \Delta_s \rangle} \; .
+\label{eq:main}
+\end{equation}
+The explicit derivation of Eq.~(\ref{eq:main}) was obtained in Ref.~\cite{radicchi2013detectability}.
+The expression of Eq.~(\ref{eq:main}) is valid as long as the individual components of the principal eigenvectors are
+proportional to the difference between the within- and cross-cluster strengths of the individual nodes.
+In the above expression,
+%$\Delta_s = s_\text{in} - s_\text{out}$, with $s_\text{in}$ being the strength of a generic node measured only on edges connecting that node to other nodes within the same community, and $s_\text{out}$ being the strength of a generic node measured only on edges connecting that node to other nodes in the other community.
+$\langle x \rangle$ indicates the average of the quantity $x$ over the ensemble of PPMs corresponding to a given set of model parameters. $\lambda$ is therefore well approximated by the ratio between the second and the first moments of the distribution $D(\Delta_s)$ of Eq.~(\ref{eq:conv2}).
+
+
+As a rule of thumb, we expect that $\lambda$ assumes large values when communities are well separated one from the other; it becomes instead comparable with the largest eigenvalue of a graph with similar average strength but no block structure when communities are too fuzzy to be detected. The latter condition is the one typically used to determine the so-called detectability threshold, i.e., the maximum level of mixing that the spectral method can tolerate in order make a prediction better than random guessing~\cite{nadakuditi2012graph}.
+Although the above procedure assumes that a spectral method  is used for the detection of communities, the actual threshold that can be derived from this analysis matches exactly the one obtained with a purely information-theoretical approach~\cite{abbe2015community}. In this respect, it represents a limit that can not be overcome by any community detection method.
+
+
+%The corresponding maximum of the modularity function is
+%\[
+%Q_{\max} = \frac{\lambda}{2 (\langle s_\text{in} \rangle + \langle s_\text{out} \rangle) \, N } \; .
+%\]
+
+
+
+\subsection*{Moments of the strength and the strength-differential distributions}
+
+In the following, we derive expressions for the first two moments $\langle \Delta_s \rangle$ and $\langle \Delta_s^2 \rangle$ of the distribution $D$ in terms of the moments of the model distributions $K_\text{in}$, $K_\text{out}$, $W_\text{in}$, and $W_\text{out}$. To this end, we rely on the formalism of the moment generating functions, which appears particularly well suited in our case where we focus on distributions of linear combinations of independent random variables.
+
+The moment generating function $M_D(x)$ of the distribution $D$ is
+\[
+M_D(x) = M_{S_\text{in}}(x) \, M_{S_\text{out}}(-x) \; .
+\]
+The moment generating function $M_{S_\text{in}}(x)$ of the distribution $S_\text{in}$ is
+\[
+M_{S_\text{in}}(x) =
+%\sum_{k=0}^{N-1}
+\sum_{k}
+\, K_\text{in}(k) \, \left[ M_{W_\text{in}}(x) \right]^k \;.
+\]
+Similarly, we have
+\[
+M_{S_\text{out}}(x) =
+%\sum_{k=0}^{N} \, K_\text{out}(k) \, \left[ M_{W_\text{out}}(x) \right]^k \;.
+\sum_{k} \, K_\text{out}(k) \, \left[ M_{W_\text{out}}(x) \right]^k \; .
+\]
+For compactness of notation, in the following we denote the first and second derivatives wrt $x$ of the function $M(x)$ respectively as $\frac{\partial}{\partial x} M(x) = M'(x)$ and $\frac{\partial^2}{\partial x^2} M(x) = M''(x) $. Thus,
+the first derivative of $M_D(x)$ is
+%\begin{equation}
+\[
+M'_D(x)   = M'_{S_\text{in}}(x)\, M_{S_\text{out}}(-x)   - M'_{S_\text{out}}(-x)  \, M_{S_\text{in}}(x)
+\]
+%\label{eq:D1}
+%\end{equation}
+The second derivative is
+%\begin{equation}
+\[
+\begin{array}{ll}
+M''_D(x) = & M''_{S_\text{in}}(x)\, M_{S_\text{out}}(-x)
+- 2 M'_{S_\text{in}}(x)\, M'_{S_\text{out}}(-x)
+\\
+& + M''_{S_\text{out}}(-x)  \, M_{S_\text{in}}(x)
+\end{array}
+\; .
+\]
+%\label{eq:D2}
+%\end{equation}
+The first derivative of $M_{S_\text{in}}(x)$ is
+%\begin{equation}
+\[
+M'_{S_\text{in}}(x) =
+%M'_{W_\text{in}}(x) \sum_{k=0}^{N-1} \, K_\text{in}(k) \, k \,  \left[ M_{W_\text{in}}(x) \right]^{k-1}
+M'_{W_\text{in}}(x) \sum_{k}\, K_\text{in}(k) \, k \,  \left[ M_{W_\text{in}}(x) \right]^{k-1}
+\]
+%\label{eq:S1}
+%\end{equation}
+whereas the second derivative is
+%\begin{equation}
+\[
+\begin{array}{ll}
+M''_{S_\text{in}}(x) = &
+%M''_{W_\text{in}}(x) \sum_{k=0}^{N-1} \, K_\text{in}(k) \, k \,  \left[ M_{W_\text{in}}(x) \right]^{k-1} + [M'_{W_\text{in}}(x)]^2 \sum_{k=0}^{N-1} \, K_\text{in}(k) \, k (k-1) \,  \left[ M_{W_\text{in}}(x) \right]^{k-2} \; .
+M''_{W_\text{in}}(x) \sum_{k} \, K_\text{in}(k) \, k \,  \left[ M_{W_\text{in}}(x) \right]^{k-1}
+\\
+& + [M'_{W_\text{in}}(x)]^2 \sum_{k} \, K_\text{in}(k) \, k (k-1) \,  \left[ M_{W_\text{in}}(x) \right]^{k-2}
+\end{array}
+\; .
+\]
+%\label{eq:S2}
+%\end{equation}
+Similar equations hold for the derivatives of $M_{S_\text{out}}(x)$.
+The first moment  and the second moments  of the distribution $D$ are
+obtained as $\langle \Delta_s \rangle = M'_D(x=0)$ and $\langle \Delta_s^2 \rangle = M''_D(x=0)$, respectively. We have
+\begin{equation}
+\langle \Delta_s \rangle   = \langle s_\text{in} \rangle   - \langle s_\text{out} \rangle
+\label{eq:mD1}
+\end{equation}
+and
+\begin{equation}
+\langle \Delta_s^2 \rangle  = \langle s^2_\text{in} \rangle \,
+- 2 \langle s_\text{in} \rangle \langle s_\text{out} \rangle + \langle s^2_\text{out} \rangle \; .
+\label{eq:mD2}
+\end{equation}
+
+Specifically, we have that
+\begin{equation}
+\langle s_\text{in} \rangle =
+%\langle w_\text{in} \rangle \sum_{k=0}^{N-1} \, K_\text{in}(k) \, k = \langle w_\text{in} \rangle \langle k_\text{in} \rangle
+\langle w_\text{in} \rangle \sum_{k} \, K_\text{in}(k) \, k = \langle w_\text{in} \rangle \langle k_\text{in} \rangle
+\label{eq:mS1}
+\end{equation}
+and
+\begin{equation}
+\begin{array}{ll}
+%\langle s^2_\text{in} \rangle = & \langle w^2_\text{in} \rangle \sum_{k=0}^{N-1} \, K_\text{in}(k) \, k  + \langle w_\text{in} \rangle^2 \sum_{k=0}^{N-1} \, K_\text{in}(k) \, k (k-1)
+\langle s^2_\text{in} \rangle = & \langle w^2_\text{in} \rangle \sum_{k} \, K_\text{in}(k) \, k  + \langle w_\text{in} \rangle^2 \sum_{k} \, K_\text{in}(k) \, k (k-1)
+\\
+& =\langle w^2_\text{in} \rangle \langle k_\text{in} \rangle + \langle w_\text{in} \rangle^2 \left( \langle k^2_\text{in} \rangle - \langle k_\text{in} \rangle  \right)
+\end{array}
+\; .
+\label{eq:mS2}
+\end{equation}
+
+Similar expressions are valid for $\langle s_\text{out} \rangle$ and $\langle s^2_\text{out} \rangle$.
+Using Eqs.~(\ref{eq:mD1}),~(\ref{eq:mD2}),~(\ref{eq:mS1}) and~(\ref{eq:mS2}), we can estimate the largest eigenvalue of the modularity matrix, i.e., Eq.~(\ref{eq:main}), as a function of the first two moments of the input distributions $K_\text{in}$, $K_\text{out}$, $W_\text{in}$ and $W_\text{out}$.
+
+
+
+\section*{Results}
+
+Having established the theoretical framework for detectability in weighted networks, we now apply our methods to derive explicit detectability thresholds for three fundamental weight distributions: Dirac, Poisson, and exponential. These distributions capture different scenarios in real-world networks---from deterministic weights to count data to maximum-entropy distributions. To isolate the effect of edge weight variability on detectability, we consider the standard planted partition model (PPM) topology where degree distributions follow binomial distributions in the large-$N$ limit:
+\begin{equation}
+K_\text{in}(k) = {N-1 \choose k} \, p_{\text{in}}^{k} \left(1 - p_\text{in} \right)^{N-1-k}   \; ,
+    \label{eq:standard1}
+\end{equation}
+\begin{equation}
+K_\text{out}(k) = {N \choose k} \, p_{\text{out}}^{k} \left(1 - p_\text{out} \right)^{N-k}  \; .
+    \label{eq:standard2}
+\end{equation}
+Assuming $N \gg 1$, we can reduce the former Eqs.~(\ref{eq:mS1}) and~(\ref{eq:mS2}) respectively to
+\begin{equation}
+    \langle s_\text{in}\rangle  = \langle w_\text{in} \rangle \kappa_\text{in}
+    \label{eq:mS1a}
+\end{equation}
+and
+\begin{equation}
+\langle s_\text{in}^2 \rangle = \langle w^2_\text{in} \rangle \kappa_\text{in} + \langle w_\text{in} \rangle^2 \kappa_\text{in}^2
+ \label{eq:mS2a}
+\end{equation}
+where
+\begin{equation}
+\kappa_\text{in} = N p_{\text{in}} \; .
+\label{eq:kappa_in}
+\end{equation}
+Similar expressions are valid for $\langle s_\text{out}\rangle$ and $\langle s_\text{out}^2\rangle$, which are defined
+on the basis of the first moment of the cross-community degree distribution
+\begin{equation}
+\kappa_\text{out} = N p_{\text{out}} \; .
+\label{eq:kappa_out}
+\end{equation}
+To derive a unified framework for different weight distributions, we parameterize the second moment of edge weights as a second-order polynomial of the mean:
+\begin{equation}
+\langle w^2 \rangle = \alpha_0 + \alpha_1 \langle w \rangle + \alpha_2 \langle w \rangle^2 \; .
+\label{eq:second_order_polynomial}
+\end{equation}
+This parameterization captures the variance structure of several important distributions through different values of $(\alpha_0, \alpha_1, \alpha_2)$:
+\begin{equation}
+    (\alpha_0, \alpha_1, \alpha_2) =
+    \left\{
+    \begin{array}{ll}
+        (0, 0, 1) & \text{(Dirac)} \\
+        (0, 1, 1) & \text{(Poisson)} \\
+        (0, -1, 2) & \text{(Geometric)} \\
+        (0, 0, 2) & \text{(Exponential)} \\
+        (1, 0, 0) & \text{(Sign)}
+    \end{array}
+    \right.
+    \label{eq:second_order_polynomial_family}
+\end{equation}
+
+We begin by examining the case where edge weights are homogeneous across communities, i.e., $\langle w_\text{in} \rangle = \langle w_\text{out} \rangle = \Omega/2$, where $\Omega = \langle w_\text{in} \rangle + \langle w_\text{out} \rangle$ represents the total average weight.
+In this scenario, community structure manifests only through the network topology, not through weight heterogeneity. This provides a crucial benchmark to validate our results against the well-established results in the literature.
+
+Substituting our expressions for the moments of strength distributions (Eqs.~\eqref{eq:mS1a}--\eqref{eq:second_order_polynomial}) into the eigenvalue formula (Eq.~\eqref{eq:main}), we obtain the following key result (see Appendix~\ref{sec:derivation_of_lambda} for detailed derivation):
+\begin{equation}
+    \lambda = \frac{\Delta_{\kappa}}{2}\Omega + \frac{1}{\Delta_{\kappa}} \cdot \frac{KC}{2\Omega}
+\label{eq:lambda_moment_homogeneous_weights}
+\end{equation}
+where we have defined $\Delta_{\kappa} = \kappa_\text{in} - \kappa_\text{out}$ and $C =  4\alpha_0  + 2\Omega\alpha_1 + \Omega^2\alpha_2$.
+
+For fixed $K$, $\lambda$ has a non-monotonic behavior as a function of $\Delta_k$. Starting from $\Delta_k = K$, at first $\lambda$ decreases as $\Delta_k$ decreases, denoting that the modularity of the ground-truth partition of the network decreases as the ground-truth partition becomes loose. However, $\lambda$ increases again after reaching its minimum value for $\Delta_k = \Delta^*_K$. Such an increase does not correspond to a real increase of the strength of the modular structure, rather only to the violation of the assumptions made to reach Eq.~(\ref{eq:main}). The emergence of such a physically meaningless solution occurs at the detectability threshold. To compute the latter quantity, we set the derivative of $\lambda$ with respect to $\Delta_k$ equal to zero, i.e.,
+\begin{equation}
+    \left. \frac{\partial \lambda}{\partial \Delta_k} \right|_{\Delta_k = \Delta_k^*} =
+    \frac{1}{2}\Omega - \frac{1}{\Delta_{\kappa}^2} \cdot \frac{KC}{2\Omega}
+    = 0
+\end{equation}
+leading to the detectability threshold
+\begin{equation}
+\Delta_k^* = \frac{\sqrt{K \left( 4 \alpha_{0}+ 2 \Omega \alpha_{1}+\Omega^{2} \alpha_{2} \right)}}{\Omega}
+\label{eq:lambda_moment_homogeneous_weights_general}
+\end{equation}
+Equation~(\ref{eq:lambda_moment_homogeneous_weights_general}) is a general expression that includes the classic detectability threshold for unweighted networks as a special case, as we will demonstrate in the case of the Dirac weights.
+
+Next, we consider the complementary scenario where the network topology is homogeneous (an Erd\H{o}s--R\'enyi random graph with $\kappa_\text{in} = \kappa_\text{out} = K/2$), but communities are encoded solely through edge weight differences. Defining $\Delta_\omega = \omega_\text{in} - \omega_\text{out}$ as the weight difference between communities, we obtain:
+\begin{equation}
+    \lambda = \frac{\Delta_{\omega}}{2} \left(K + \alpha_2 \right) + \frac{C}{2 \Delta_{\omega}}
+    \label{eq:lambda_moment_homogeneous_weights_general_omega}
+\end{equation}
+(See Appendix~\ref{sec:detailed_derivation_homogeneous_topology} for the derivation of this expression.)
+Thus, by taking the derivative of $\lambda$ with respect to $\Delta_\omega$ and setting it equal to zero, we obtain the detectability threshold
+\begin{equation}
+    \Delta_\omega^* = \sqrt{\frac{4 \alpha_{0} + 2 \Omega \alpha_{1} + \Omega^{2} \alpha_{2} }{K + \alpha_{2}}}
+    \label{eq:lambda_moment_homogeneous_weights_general_omega}
+\end{equation}
+
+
+With this general framework established, we now examine specific weight distributions that represent different network scenarios.
+
+\subsection*{Dirac weights}
+\label{sec:dirac_weights}
+
+The Dirac distribution represents the simplest case where edge weights are deterministic functions of community membership. This scenario arises in networks with fixed interaction strengths, such as power grids with predetermined transmission capacities or social networks where relationship types (friend, colleague, family) determine fixed interaction strengths. Notably, networks constructed from correlation matrices---commonly used in neuroscience, finance, and genomics---converge to this Dirac case in the limit of large sample sizes, as sample correlations approach their true values and variance vanishes (see Appendix~\ref{sec:correlation_matrix} for details).
+
+For Dirac-distributed weights, all edges within (between) communities have identical weight $\omega_{\text{in}}$ ($\omega_{\text{out}}$), yielding zero variance. This corresponds to $\alpha_0 = 0$, $\alpha_1 = 0$, and $\alpha_2 = 1$ in our parameterization. Substituting these values into Eq.~\eqref{eq:lambda_moment_homogeneous_weights_general}:
+\begin{equation}
+\Delta_k^* = \frac{\sqrt{K \cdot \Omega^2}}{\Omega} = \sqrt{K}
+\label{eq:dirac_det}
+\end{equation}
+This recovers the classic result for unweighted networks, validating our general framework.
+
+For the case of homogeneous topology ($\Delta_{\kappa} = 0$), we obtain:
+\begin{equation}
+\Delta_\omega^* = \frac{\Omega}{\sqrt{K+1}}
+\label{eq:dirac_w_det}
+\end{equation}
+
+\subsection*{Poisson weights}
+
+The Poisson distribution naturally arises in networks where edge weights represent counts of discrete interactions or events. This includes communication networks (where weights count messages exchanged), transportation networks (counting trips or passengers), and biological networks (counting molecular interactions). The Poisson distribution is particularly relevant when these counts result from independent random events occurring at a constant rate, making it a fundamental model for understanding detectability in count-based weighted networks.
+
+For the Poisson distribution, the first two moments are $\langle w \rangle = \omega$ and $\langle w^2 \rangle = \omega^2 + \omega$, corresponding to $\alpha_0 = 0$, $\alpha_1 = 1$, and $\alpha_2 = 1$ in our parameterization. Applying the general formula Eq.~\eqref{eq:lambda_moment_homogeneous_weights_general}, we obtain:
+\begin{equation}
+    \Delta_k^* = \sqrt{\frac{K \left( \Omega +2\right)}{\Omega}}
+\label{eq:poisson_det}
+\end{equation}
+Unlike the Dirac case, the detectability threshold now depends on the total weight $\Omega$. For small $\Omega$, the threshold is large, making communities difficult to detect. As $\Omega$ increases, the threshold approaches $\sqrt{K}$, converging to the Dirac result.
+Notably, $\Delta_k^*$ for the Poisson distribution is larger than the Dirac case,
+suggesting that the communities in the network of Poisson-distributed weights are harder to detect than in the Dirac case in terms of the detectability limit.
+
+For the case of homogeneous topology ($\Delta_{\kappa} = 0$), we obtain:
+\begin{equation}
+    \Delta_\omega^* = \sqrt{\frac{\Omega (\Omega +2)}{K + 1}}
+\label{eq:poisson_w_det}
+\end{equation}
+which, again, is larger than the Dirac case.
+
+These findings challenge the common belief that edge weights enhance community detection by providing information additional to the topological information. Our analysis suggests that edge weights can actually impede community detection when they do not reflect the community structure in terms of the detectability limit. Specifically, when edge weights are ignored, the detectability threshold reduces to that of the Dirac case, widening the detectable regime. This suggests that the utility of edge weights in community detection depends critically on whether they reinforce rather than obscure the community structure.
+
+\subsection*{Exponential weights}
+
+The exponential distribution emerges in networks where edge weights represent waiting times, durations, or distances between events, which is prevalent in temporal and spatial networks. Notably, the exponential distribution has maximum entropy among all continuous distributions with a fixed mean, making it a natural choice when only the average weight is constrained. Its high variance represents the most challenging scenario for community detection.
+
+For the exponential distribution, the first two moments are $\langle w \rangle = \omega$ and $\langle w^2 \rangle = 2\omega^2$, yielding $\alpha_0 = 0$, $\alpha_1 = 0$, and $\alpha_2 = 2$. From Eq.~\eqref{eq:lambda_moment_homogeneous_weights_general}:
+\begin{equation}
+\Delta_k^* = \sqrt{2K}
+\label{eq:expon_det}
+\end{equation}
+This threshold is exactly $\sqrt{2}$ times larger than the Dirac case, reflecting the increased difficulty in detecting communities when edge weights have high variance.
+Notably, the detectability threshold does not depend on the total weight $\Omega$ in the case of the exponential distribution, which is different from the Poisson case.
+
+For the case of homogeneous topology ($\Delta_{\kappa} = 0$), we obtain:
+\begin{equation}
+\Delta_\omega^* = \Omega\sqrt{\frac{2}{K+2}}.
+\label{eq:expon_w_det}
+\end{equation}
+
+\subsection*{Geometric weights}
+
+The geometric distribution arises in networks where edge weights represent the number of trials until the first success in a sequence of independent Bernoulli trials. The geometric distribution is useful for modeling over-dispersed count data, where the variance exceeds the mean, making it suitable for scenarios where interaction frequencies exhibit high variability compared to Poisson processes.
+
+For the geometric distribution with success probability $p$, the first two moments are $\langle w \rangle = 1/p$ and $\langle w^2 \rangle = (2-p)/p^2$. Setting $\omega = 1/p$, we obtain $\langle w^2 \rangle = 2\omega^2 - \omega$, corresponding to $\alpha_0 = 0$, $\alpha_1 = -1$, and $\alpha_2 = 2$. From Eq.~\eqref{eq:lambda_moment_homogeneous_weights_general}:
+\begin{equation}
+\Delta_k^* = \sqrt{\frac{2K(\Omega - 1)}{\Omega}}.
+\label{eq:geometric_det}
+\end{equation}
+Note that $\Omega >1$ always holds for the geometric distribution.
+Likewise the Poisson weights, the detectability threshold depends on the total weight $\Omega$ and is always smaller than the exponential case, with the difference approaching zero as $\Omega$ increases.
+
+For homogeneous topology:
+\begin{equation}
+\Delta_\omega^* = \sqrt{\frac{2(\Omega - 1)\Omega}{K+2}},
+\label{eq:geometric_w_det}
+\end{equation}
+which also approaches to the exponential case from below in the limit of large $\Omega$.
+
+
+
+\subsection*{Sign weights}
+
+Sign weights represent a different scenario where edges can have both positive and negative values, as in signed social networks (friend/foe relationships), correlation networks (positive/negative correlations), or financial networks (credit/debit relationships). We consider the case where weights are $+1$ with probability $p$ and $-1$ with probability $1-p$.
+
+For this distribution, the first two moments are $\langle w \rangle = 2p - 1$ and $\langle w^2 \rangle = 1$, yielding $\alpha_0 = 1$, $\alpha_1 = 0$, and $\alpha_2 = 0$ in our parameterization. We assume that $\Omega > 0$ always holds for this distribution to ensure that the communities are assortative, i.e., the within-community and cross-community weights are likely to be positive and negative, respectively.
+
+From Eq.~\eqref{eq:lambda_moment_homogeneous_weights_general}, we obtain:
+\begin{equation}
+\Delta_k^* = \frac{2\sqrt{K}}{\Omega}
+\label{eq:sign_det}
+\end{equation}
+Notably, the detectability threshold is independent of sign imbalance $\Omega$.
+This threshold increases as the sign imbalance $\Omega$ decreases to zero, making detection harder. This echoes the result that edge weights can impede community detection  in terms of the detectability limit when they do not reflect the community structure.
+
+For the homogeneous topology case:
+\begin{equation}
+\Delta_\omega^* = \frac{2}{\sqrt{K}}
+\label{eq:sign_w_det}
+\end{equation}
+Remarkably, this threshold is independent of $\Omega$.
+In other words, when the topology does not reflect the community structure but the sign of edge weights does, the sign imbalance does not underpin the detectability limit. It is the average degree of nodes that matters.
+
+
+Having established the theoretical predictions for detectability thresholds across different weight distributions, we now turn to numerical experiments to validate these analytical results.
+
+\subsection*{Numerical validation}
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figure1.pdf}
+    \caption{(a) Detectability threshold $\Delta_k^*$ for the weighted planted partition model as a function of the average edge weight $\Omega$. Here $N=1024$ and $K=128$. Different curves corresponds to the different distributions of the weights we consider. Predictions are given by Eq.~(\ref{eq:dirac_det}) for the Dirac distribution, Eq.~(\ref{eq:poisson_det}) for the Poisson distribution, and Eq.~(\ref{eq:expon_det}) for the exponential distribution. (b)  Detectability threshold $\Delta_\omega^*$ for the weighted planted partition model as a function of the average edge weight $\Omega$. Here $N=1024$ and $K=128$. Different curves corresponds to the different distributions of the weights we consider. Predictions are given by Eq.~(\ref{eq:poisson_w_det}) for the Poisson distribution, Eq.~(\ref{eq:dirac_w_det}) for the Dirac distribution, and Eq.~(\ref{eq:expon_w_det}) for the exponential distribution.}
+    \label{fig:1}
+\end{figure}
+
+In Figure~\ref{fig:1}(a), we plot the predictions of the detectability thresholds of Eqs.~(\ref{eq:dirac_det}), ~(\ref{eq:poisson_det}) and~(\ref{eq:expon_det})  as functions of $\Omega$. Here $N=1024$ and $K=128$. Theory predicts that the easiest networks for the detection of communities  have weights obeying the Dirac distribution. Communities are easier to be detected in network with exponentially distributed weights than in networks with Poisson distributed weights for small $\Omega$ values; however, as $\Omega$ grows, the detectability in networks for Poisson distributed weights decreases, eventually becoming smaller than in networks with exponentially distributed weights. In the limit of large $\Omega$, the detectability threshold in networks with Poisson distributed weights approaches the one valid for networks with Dirac distributed weights; the detectability threshold in networks with edge weights obeying the exponential distribution instead remains larger than in the other two cases even in the limit of infinitely large $\Omega$ values.
+
+
+\begin{figure*}[!htb]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figure2.pdf}
+    \caption{(a) Largest eigenvalue $\lambda$ of the modularity matrix as a function of difference between the expected value of the within- and cross-community degrees $\Delta_k$ [i.e., Eq.(\ref{eq:delta})] for the weighted planted-partition model. Here, $N=1024$, $K=128$, $\Omega = 1$. We consider weights generated from the the Poisson (black), Dirac (red) and exponential (blue) distributions. Numerical results are averaged over $100$ realizations of the model for each $\Delta_k$ value and displayed with symbols. The solid curves represent the theoretical prediction of Eqs.~(\ref{eq:lambda_dirac}), ~(\ref{eq:lambda_poisson}) and~(\ref{eq:lambda_expon}), whereas the vertical dotted lines denote the detectability thresholds of Eqs.~(\ref{eq:dirac_det}),~(\ref{eq:poisson_det}) and~(\ref{eq:expon_det}). (b) We plot the order parameter $P$ [i.e., Eq.~(\ref{eq:order})] as a function of $\Delta$ for the same networks as in (a). The vertical dotted line denotes the detectability thresholds of Eqs.~(\ref{eq:dirac_det}),~(\ref{eq:poisson_det}) and~(\ref{eq:expon_det}). (c) Same as in (a), but for $\Omega = 10$.  (d) Same as in (b), but for $\Omega = 10$. (e) Same as in (a), but for $\Omega = 100$.  (f) Same as in (b), but for $\Omega = 100$.}
+    \label{fig:2}
+\end{figure*}
+
+The above predictions are validated in numerical experiments conducted on instances of the weighted PPM. Results are reported in Figure~\ref{fig:2}. First of all, the behavior of the largest eigenvalue $\lambda$ of the modularity matrix as a function of $\Omega$ is very well predicted by our Eqs.~(\ref{eq:lambda_dirac}), ~(\ref{eq:lambda_poisson}), and~(\ref{eq:lambda_expon}), see Figure~\ref{fig:2}(a), (c), and (e). Second the detection of the ground-truth community structure is possible only when the difference between within- and cross-cluster degrees exceeds the detectability thresholds of Eqs.~(\ref{eq:dirac_det}),~(\ref{eq:poisson_det}) and~(\ref{eq:expon_det}), see Figure~\ref{fig:2}(b), (d), and (f).
+
+
+\begin{figure*}[!htb]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figure3.pdf}
+    \caption{(a) Largest eigenvalue $\lambda$ of the modularity matrix as a function of difference between the expected value of the within- and cross-community edge weights $\Delta_\omega$ [i.e., Eq.(\ref{eq:delta})] for the weighted planted-partition model. Here, $N=1024$, $K=128$, $\Omega = 1$. We consider weights generated from the the Poisson (black), Dirac (red) and exponential (blue) distributions. Numerical results are averaged over $100$ realizations of the model for each $\Delta_\omega$ value and displayed with symbols. The solid curves represent the theoretical prediction of Eqs.~(\ref{eq:lambda_dirac_w}), ~(\ref{eq:lambda_poisson_w}) and~(\ref{eq:lambda_expon_w}), whereas the vertical dotted lines denote the detectability thresholds of Eqs.~(\ref{eq:dirac_w_det}),~(\ref{eq:poisson_w_det}) and~(\ref{eq:expon_w_det}). (b) We plot the order parameter $P$ [i.e., Eq.~(\ref{eq:order})] as a function of $\Delta$ for the same networks as in (a). The vertical dotted line denotes the detectability thresholds of Eqs.~(\ref{eq:dirac_w_det}),~(\ref{eq:poisson_w_det}) and~(\ref{eq:expon_w_det}). (c) Same as in (a), but for $\Omega = 2$.  (d) Same as in (b), but for $\Omega = 2$. (e) Same as in (a), but for $\Omega = 4$.  (f) Same as in (b), but for $\Omega = 4$.}
+    \label{fig:3}
+\end{figure*}
+
+Similar considerations are valid when the ground-truth community structure is represented by edge weights only, whereas the underlying topology of the graph is completely independent of the ground-truth partition. Also in this case, we predict an inversion in the difficulty of retrieving the ground-truth partition between the cases of Poisson and exponential edge weights, see Figure~\ref{fig:1}(b), and such a prediction is validated in numerical experiments, see Figure~\ref{fig:3}.
+
+
+\section*{Conclusions}
+
+In this paper, we provided ...
+
+
+
+%\newpage
+
+
+\bibliography{bibliography}
+
+
+\appendix
+
+\section{Derivation of Eq.~\eqref{eq:lambda_moment_homogeneous_weights}}
+\label{sec:detailed_derivation_homogeneous}
+
+This section provides a comprehensive step-by-step derivation of the eigenvalue expression for homogeneous weights, where $\langle w_\text{in} \rangle = \langle w_\text{out} \rangle = \Omega/2$. We begin from the general eigenvalue formula and systematically apply the homogeneous weight conditions to arrive at Eq.~\eqref{eq:lambda_moment_homogeneous_weights}.
+
+For homogeneous weights across communities, we have:
+\begin{align*}
+\langle w_\text{in} \rangle &= \langle w_\text{out} \rangle = \frac{\Omega}{2},\\
+\Delta_\omega &= \langle w_\text{in} \rangle - \langle w_\text{out} \rangle = 0,
+\end{align*}
+where $\Omega = \langle w_\text{in} \rangle + \langle w_\text{out} \rangle$ is the total average weight. This condition ensures that community structure manifests only through network topology, not through weight heterogeneity.
+
+We express the intra-community degree and inter-community degree in terms of the total degree $K$ and degree difference $\Delta_\kappa$:
+\begin{align*}
+\kappa_\text{in} &= \frac{K + \Delta_\kappa}{2},\\
+\kappa_\text{out} &= \frac{K - \Delta_\kappa}{2},
+\end{align*}
+where $K = \kappa_\text{in} + \kappa_\text{out}$ and $\Delta_\kappa = \kappa_\text{in} - \kappa_\text{out}$.
+
+For the second-order polynomial family of weight distributions (Eq.~\eqref{eq:second_order_polynomial}), the second moments are:
+\begin{align*}
+\langle w^2_\text{in} \rangle &= \alpha_0 + \alpha_1 \langle w_\text{in} \rangle + \alpha_2 \langle w_\text{in} \rangle^2\\
+&= \alpha_0 + \alpha_1 \frac{\Omega}{2} + \alpha_2 \left(\frac{\Omega}{2}\right)^2\\
+&= \alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4},
+\end{align*}
+and similarly:
+\begin{equation*}
+\langle w^2_\text{out} \rangle = \alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4}.
+\end{equation*}
+Under homogeneous conditions, both second moments are identical:
+\begin{equation*}
+\langle w^2_\text{in} \rangle = \langle w^2_\text{out} \rangle = \alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4}.
+\end{equation*}
+
+Substituting our expressions for the moments of strength distributions (Eqs.~\eqref{eq:mS1a}--\eqref{eq:second_order_polynomial}) into the eigenvalue formula (Eq.~\eqref{eq:main}), we obtain
+\begin{equation*}
+\lambda = \kappa_\text{in} \langle w_\text{in} \rangle - \kappa_\text{out} \langle w_\text{out} \rangle + \frac{\kappa_\text{in} \langle w^2_\text{in} \rangle + \kappa_\text{out} \langle w^2_\text{out} \rangle}{\kappa_\text{in} \langle w_\text{in} \rangle - \kappa_\text{out} \langle w_\text{out} \rangle},
+\end{equation*}
+where we have used the variance decomposition of the Poisson-distributed $k_{\text{in}}$ and $k_{\text{out}}$: $\kappa_\text{in} = \langle k_{\text{in}}^2 \rangle - \langle k_{\text{in}} \rangle^2$ and analogously for $\kappa_\text{out}$.
+
+The denominator of the fraction becomes:
+\begin{align*}
+\text{Denominator} &= \kappa_\text{in} \langle w_\text{in} \rangle - \kappa_\text{out} \langle w_\text{out} \rangle\\
+&= \frac{K + \Delta_\kappa}{2} \cdot \frac{\Omega}{2} - \frac{K - \Delta_\kappa}{2} \cdot \frac{\Omega}{2}\\
+&= \frac{\Omega}{4}\left[(K + \Delta_\kappa) - (K - \Delta_\kappa)\right]\\
+&= \frac{\Omega}{4} \cdot 2\Delta_\kappa = \frac{\Delta_\kappa \Omega}{2}.
+\end{align*}
+Since $\langle w^2_\text{in} \rangle = \langle w^2_\text{out} \rangle$ under homogeneous conditions, the numerator becomes:
+\begin{align*}
+\text{Numerator} &= \kappa_\text{in} \langle w^2_\text{in} \rangle + \kappa_\text{out} \langle w^2_\text{out} \rangle\\
+&= (\kappa_\text{in} + \kappa_\text{out}) \langle w^2_\text{in} \rangle\\
+&= K \left(\alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4}\right).
+\end{align*}
+
+The complete eigenvalue expression becomes:
+\begin{align*}
+\lambda &= \frac{\Delta_\kappa \Omega}{2} + \frac{K \left(\alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4}\right)}{\frac{\Delta_\kappa \Omega}{2}}\\
+&= \frac{\Delta_\kappa \Omega}{2} + \frac{2K \left(\alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4}\right)}{\Delta_\kappa \Omega}.
+\end{align*}
+
+To simplify the expression, we define:
+\begin{equation*}
+C = 4\alpha_0 + 2\Omega\alpha_1 + \Omega^2\alpha_2,
+\end{equation*}
+which allows us to write:
+\begin{align*}
+4\left(\alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4}\right) &= 4\alpha_0 + 2\alpha_1\Omega + \alpha_2\Omega^2 = C,
+\end{align*}
+and therefore:
+\begin{align*}
+\alpha_0 + \frac{\alpha_1 \Omega}{2} + \frac{\alpha_2 \Omega^2}{4} &= \frac{C}{4}.
+\end{align*}
+
+Substituting this into the previous expression:
+\begin{align*}
+\lambda &= \frac{\Delta_\kappa \Omega}{2} + \frac{2K \cdot \frac{C}{4}}{\Delta_\kappa \Omega}\\
+&= \frac{\Delta_\kappa \Omega}{2} + \frac{KC}{2\Delta_\kappa \Omega}\\
+&= \frac{\Delta_\kappa}{2}\Omega + \frac{1}{\Delta_\kappa} \cdot \frac{KC}{2\Omega}.
+\end{align*}
+
+We have thus derived the eigenvalue expression for homogeneous weights:
+\begin{equation}
+\boxed{\lambda = \frac{\Delta_\kappa}{2}\Omega + \frac{1}{\Delta_\kappa} \cdot \frac{KC}{2\Omega}},
+\end{equation}
+where $C = 4\alpha_0 + 2\Omega\alpha_1 + \Omega^2\alpha_2$ encapsulates the weight distribution characteristics through the polynomial coefficients $(\alpha_0, \alpha_1, \alpha_2)$.
+
+
+\section{Derivation of Eq.~\eqref{eq:lambda_moment_homogeneous_weights_general_omega}}
+\label{sec:detailed_derivation_homogeneous_topology}
+
+This section provides a comprehensive derivation of the eigenvalue expression and detectability threshold for the complementary case where network topology is homogeneous (i.e., $\kappa_\text{in} = \kappa_\text{out} = K/2$), but communities are encoded solely through edge weight differences. This corresponds to an Erdős–Rényi random graph where community structure manifests only through weight heterogeneity.
+
+For homogeneous topology, we have:
+\begin{align*}
+\kappa_\text{in} &= \kappa_\text{out} = \frac{K}{2},\\
+\Delta_\kappa &= \kappa_\text{in} - \kappa_\text{out} = 0,
+\end{align*}
+where community structure is encoded through weight differences:
+\begin{align*}
+\langle w_\text{in} \rangle &= \frac{\Omega}{2} + \frac{\Delta_\omega}{2},\\
+\langle w_\text{out} \rangle &= \frac{\Omega}{2} - \frac{\Delta_\omega}{2},
+\end{align*}
+where $\Delta_\omega = \langle w_\text{in} \rangle - \langle w_\text{out} \rangle$ is the weight difference between communities and $\Omega = \langle w_\text{in} \rangle + \langle w_\text{out} \rangle$ is the total average weight.
+
+For the second-order polynomial family of weight distributions, the second moments are:
+\begin{align*}
+\langle w^2_\text{in} \rangle &= \alpha_0 + \alpha_1 \langle w_\text{in} \rangle + \alpha_2 \langle w_\text{in} \rangle^2\\
+&= \alpha_0 + \alpha_1 \left(\frac{\Omega}{2} + \frac{\Delta_\omega}{2}\right) + \alpha_2 \left(\frac{\Omega}{2} + \frac{\Delta_\omega}{2}\right)^2\\
+&= \alpha_0 + \alpha_1 \frac{\Omega + \Delta_\omega}{2} + \alpha_2 \frac{(\Omega + \Delta_\omega)^2}{4},
+\end{align*}
+and:
+\begin{align*}
+\langle w^2_\text{out} \rangle &= \alpha_0 + \alpha_1 \left(\frac{\Omega}{2} - \frac{\Delta_\omega}{2}\right) + \alpha_2 \left(\frac{\Omega}{2} - \frac{\Delta_\omega}{2}\right)^2\\
+&= \alpha_0 + \alpha_1 \frac{\Omega - \Delta_\omega}{2} + \alpha_2 \frac{(\Omega - \Delta_\omega)^2}{4}.
+\end{align*}
+
+Starting from the general eigenvalue formula (Eq.~\eqref{eq:main}) and substituting the homogeneous topology conditions, the denominator becomes:
+\begin{align*}
+\text{Denominator} &= \kappa_\text{in} \langle w_\text{in} \rangle - \kappa_\text{out} \langle w_\text{out} \rangle\\
+&= \frac{K}{2} \left(\frac{\Omega}{2} + \frac{\Delta_\omega}{2}\right) - \frac{K}{2} \left(\frac{\Omega}{2} - \frac{\Delta_\omega}{2}\right)\\
+&= \frac{K}{2} \left[\left(\frac{\Omega}{2} + \frac{\Delta_\omega}{2}\right) - \left(\frac{\Omega}{2} - \frac{\Delta_\omega}{2}\right)\right]\\
+&= \frac{K}{2} \cdot \Delta_\omega = \frac{K\Delta_\omega}{2}.
+\end{align*}
+
+For the numerator, we compute:
+\begin{align*}
+\text{Numerator} &= \kappa_\text{in} \langle w^2_\text{in} \rangle + \kappa_\text{out} \langle w^2_\text{out} \rangle\\
+&= \frac{K}{2} \langle w^2_\text{in} \rangle + \frac{K}{2} \langle w^2_\text{out} \rangle\\
+&= \frac{K}{2} \left(\langle w^2_\text{in} \rangle + \langle w^2_\text{out} \rangle\right).
+\end{align*}
+
+Expanding the sum of second moments:
+\begin{align*}
+\langle w^2_\text{in} \rangle + \langle w^2_\text{out} \rangle &= \left[\alpha_0 + \alpha_1 \frac{\Omega + \Delta_\omega}{2} + \alpha_2 \frac{(\Omega + \Delta_\omega)^2}{4}\right]\\
+&\quad + \left[\alpha_0 + \alpha_1 \frac{\Omega - \Delta_\omega}{2} + \alpha_2 \frac{(\Omega - \Delta_\omega)^2}{4}\right]\\
+&= 2\alpha_0 + \alpha_1 \frac{(\Omega + \Delta_\omega) + (\Omega - \Delta_\omega)}{2}\\
+&\quad + \alpha_2 \frac{(\Omega + \Delta_\omega)^2 + (\Omega - \Delta_\omega)^2}{4}\\
+&= 2\alpha_0 + \alpha_1 \Omega \\
+&\quad + \alpha_2 \frac{\Omega^2 + 2\Omega\Delta_\omega + \Delta_\omega^2 + \Omega^2 - 2\Omega\Delta_\omega + \Delta_\omega^2}{4}\\
+&= 2\alpha_0 + \alpha_1 \Omega + \alpha_2 \frac{2\Omega^2 + 2\Delta_\omega^2}{4}\\
+&= 2\alpha_0 + \alpha_1 \Omega + \alpha_2 \frac{\Omega^2 + \Delta_\omega^2}{2}.
+\end{align*}
+
+Therefore, the numerator becomes:
+\begin{align*}
+\text{Numerator} &= \frac{K}{2} \left(2\alpha_0 + \alpha_1 \Omega + \alpha_2 \frac{\Omega^2 + \Delta_\omega^2}{2}\right)\\
+&= K\alpha_0 + \frac{K\alpha_1 \Omega}{2} + \frac{K\alpha_2(\Omega^2 + \Delta_\omega^2)}{4}.
+\end{align*}
+
+The complete eigenvalue expression becomes:
+\begin{align*}
+\lambda &= \frac{K\Delta_\omega}{2} + \frac{K\alpha_0 + \frac{K\alpha_1 \Omega}{2} + \frac{K\alpha_2(\Omega^2 + \Delta_\omega^2)}{4}}{\frac{K\Delta_\omega}{2}}\\
+&= \frac{K\Delta_\omega}{2} + \frac{2\left(K\alpha_0 + \frac{K\alpha_1 \Omega}{2} + \frac{K\alpha_2(\Omega^2 + \Delta_\omega^2)}{4}\right)}{K\Delta_\omega}\\
+&= \frac{K\Delta_\omega}{2} + \frac{2\alpha_0}{\Delta_\omega} + \frac{\alpha_1 \Omega}{\Delta_\omega} + \frac{\alpha_2(\Omega^2 + \Delta_\omega^2)}{2\Delta_\omega}\\
+&= \frac{K\Delta_\omega}{2} + \frac{\alpha_2\Delta_\omega}{2} + \frac{2\alpha_0}{\Delta_\omega} + \frac{\alpha_1 \Omega}{\Delta_\omega} + \frac{\alpha_2\Omega^2}{2\Delta_\omega}\\
+&= \frac{\Delta_\omega}{2}(K + \alpha_2) + \frac{2\alpha_0 + \alpha_1 \Omega + \frac{\alpha_2\Omega^2}{2}}{\Delta_\omega}.
+\end{align*}
+
+We can rewrite this in terms of the parameter $C = 4\alpha_0 + 2\Omega\alpha_1 + \Omega^2\alpha_2$:
+\begin{align*}
+2\alpha_0 + \alpha_1 \Omega + \frac{\alpha_2\Omega^2}{2} &= \frac{4\alpha_0 + 2\alpha_1 \Omega + \alpha_2\Omega^2}{2} = \frac{C}{2}.
+\end{align*}
+
+Therefore, the eigenvalue expression becomes:
+\begin{equation*}
+\lambda = \frac{\Delta_\omega}{2}(K + \alpha_2) + \frac{C}{2\Delta_\omega}.
+\end{equation*}
+
+To find the detectability threshold, we take the derivative with respect to $\Delta_\omega$ and set it equal to zero:
+\begin{align*}
+\frac{\partial \lambda}{\partial \Delta_\omega} &= \frac{K + \alpha_2}{2} - \frac{C}{2\Delta_\omega^2} = 0,
+\end{align*}
+which gives:
+\begin{align*}
+\frac{K + \alpha_2}{2} &= \frac{C}{2\Delta_\omega^2},\\
+\Delta_\omega^2 &= \frac{C}{K + \alpha_2},\\
+\Delta_\omega^* &= \sqrt{\frac{C}{K + \alpha_2}} = \sqrt{\frac{4\alpha_0 + 2\Omega\alpha_1 + \Omega^2\alpha_2}{K + \alpha_2}}.
+\end{align*}
+
+We have thus derived the detectability threshold for homogeneous topology:
+\begin{equation}
+\boxed{\Delta_\omega^* = \sqrt{\frac{4\alpha_0 + 2\Omega\alpha_1 + \Omega^2\alpha_2}{K + \alpha_2}}},
+\end{equation}
+which is Eq.~\eqref{eq:lambda_moment_homogeneous_weights_general_omega}.
+
+The eigenvalue expression for homogeneous topology reveals that detectability depends on the competition between a linear term in $\Delta_\omega$ (scaled by $K + \alpha_2$) and an inverse term containing the weight distribution variance parameter $C$. Unlike the homogeneous weight case, the coefficient of the linear term includes $\alpha_2$, reflecting the additional contribution from weight variance when weights are heterogeneous across communities.
+
+
+\section{Correlation matrix}
+\label{sec:correlation_matrix}
+
+Many weighted networks are constructed based on correlation matrices. Let us consider $N$-dimensional gaussian random vectors with zero mean, unit variance, and $L$ observations. We can write
+\begin{equation}
+\mathbf{X} = \left[ \mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_L \right] \; ,
+\end{equation}
+where $\mathbf{x}_i$ is the $i$-th observation of the $N$-dimensional gaussian random vector. We can write the correlation matrix as
+\begin{equation}
+    \mathbf{R} = \frac{1}{L} \mathbf{X} \mathbf{X}^T \; ,
+\end{equation}
+Note that $R$ is a correlation matrix since we assumed that the input random variables are centered at zero and normalized to have unit variance.
+
+Before considering the detectability limit, let us prepare ourselves by identifying the distribution of the sample correlation coefficient $r$.
+The exact probability density function of the sample correlation coefficient $r$ is rather complex. Thus, we use an approximation based on the Fisher-$z$ transform, which is accurate when the sample size $L$ is large. Specifically, for a sample correlation coefficient $r$, we apply the Fisher-$z$ transform:
+\begin{equation}
+    z(r) := \text{tanh}^{-1}(r) = \frac{1}{2} \log \left( \frac{1+r}{1-r} \right) \; ,
+\end{equation}
+where $r$ is the sample correlation coefficient.
+For a large sample size $L$, $z(r)$ follows a gaussian distribution with mean being the true correlation $\rho$ and variance $\frac{1}{L-3}$~\cite{hotelling1953new}.
+Taking the Taylor expansion of $r=\text{tanh}(z(r))$ around $\rho$ leads to
+\begin{align}
+    \text{tanh}(z(\rho) + \epsilon) &\approx \text{tanh}(z(\rho)) + (1-\text{tanh}^2(z(\rho))) \epsilon + \mathcal{O}(\epsilon^2) \nonumber \\
+    &=\rho + (1-\rho^2) \epsilon + \mathcal{O}(\epsilon^2),
+\end{align}
+Thus the sample correlation follows approximately a gaussian distribution~\cite{hotelling1953new}, i.e.,
+\begin{equation}
+    R_{ij} \sim {\cal N}\left(\rho, \frac{(1-\rho^2_{ij})^2}{L-3}\right). \label{eq:hotelling_dist}
+\end{equation}
+
+Armed with this result, let us consider the detectability limit for the modularity matrix $\mathbf{Q}$.
+Unlike other weighted networks considered in this paper, the correlation values are interdependent.
+However, this interdependence weakens as the sample size ($L$) grows. Thus, we assume that the edge weights are effectively independent by assuming large sample size $L$.
+The first and second moment of the edge weight is given by
+\begin{align}
+    \langle w_\text{in} \rangle &=  \omega_\text{in} \\
+    \langle w_\text{in}^2 \rangle &= \omega_\text{in}^2 +  \frac{1}{L-3} \left(1 - \omega_\text{in}^2\right)^2
+\end{align}
+and the momements for $w_{\text{out}}$ are analogous.
+Plugging these into Eq.~(\ref{eq:lambda_moment}), we have:
+\begin{align}
+    \lambda =\kappa_{\text{in}} \omega_{\text{in}} - \kappa_{\text{out}} \omega_{\text{out}} +  \frac{\kappa_{\text{in}} \left(\omega_{\text{in}}^{2} + \frac{\left(1 - \omega_{\text{in}}^{2}\right)^{2}}{L - 3}\right) + \kappa_{\text{out}} \left(\omega_{\text{out}}^{2} + \frac{\left(1 - \omega_{\text{out}}^{2}\right)^{2}}{L - 3}\right)}{\kappa_{\text{in}} \omega_{\text{in}} - \kappa_{\text{out}} \omega_{\text{out}}}
+\end{align}
+Assuming $L \gg 1$, we have
+\begin{align}
+    \lambda =\kappa_{\text{in}} \omega_{\text{in}} - \kappa_{\text{out}} \omega_{\text{out}} +  \frac{\kappa_{\text{in}} \omega_{\text{in}}^{2} + \kappa_{\text{out}} \omega_{\text{out}}^{2}}{\kappa_{\text{in}} \omega_{\text{in}} - \kappa_{\text{out}} \omega_{\text{out}}}
+\end{align}
+which reduces to the expression for Dirac-distributed weights [Eq.~\eqref{eq:lambda_dirac}]. This demonstrates that for large sample sizes, correlation-based networks behave similarly to networks with Dirac-distributed weights, as the finite sample size effects vanish and the sample correlation coefficients converge to their true values.
+
+By solving $\partial \lambda / \partial \Delta_\kappa = 0$ or $\partial \lambda / \partial \Delta_\omega = 0$, we have
+\begin{align}
+    \Delta_\kappa^* &= \frac{- \Delta_{\omega} K + \sqrt{K \left(- \Delta_{\omega}^{2} + \Omega^{2}\right)}}{\Omega} \\
+    \Delta_\omega^* &= \frac{\Omega \left(- \Delta_{\kappa} K - \Delta_{\kappa} + \sqrt{- \Delta_{\kappa}^{2} K - \Delta_{\kappa}^{2} + K^{3} + K^{2}}\right)}{K \left(K + 1\right)}
+\end{align}
+If $\Delta_\kappa = 0$ (which is $\kappa_{\text{in}} = \kappa_{\text{out}} = K/2$), we have
+\begin{align}
+    \Delta_\omega^* &= \frac{\Omega}{\sqrt{K + 1}}
+\end{align}
+If $\Delta_\omega = 0$ (which is $\omega_{\text{in}} = \omega_{\text{out}} = \Omega/2$), we have
+\begin{align}
+    \Delta_\kappa^* &= \sqrt{K}
+\end{align}
+which corresponds to the detectability threshold of the unweighted PPM. Notably, the detectability threshold is determined only by the density of the network, regardless of the total strength of the correlations.
+
+\subsection*{Numerical validation for correlation matrices}
+
+We confirm that the theoretical results for the Dirac distribution closely match the numerical results for correlation matrices (Fig.~\ref{fig:correlation_matrix}).
+We observe the eigenvalues of the modularity matrix is negative, which is due to the nature of the power iteration method. Namely, the algorithm identified the largest eigenvalue in magnitude.
+The power iteration method identifies the eigenvector associated with the largest eigenvalue in magnitude.
+As a result, when the smallest eigenvalue is larger than the largest eigenvalue in magnitude, the power iteration method identifies the smallest eigenvalue instead.
+We have confirmed this by computing all the eigenvalues of the modularity matrix numerically for some networks and compared them with that obtained by the power iteration method.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.5\textwidth]{CorrelationMatrix.pdf}
+    \caption{Validation of the correlation matrix theory. The figure shows that as the sample size $L$ increases, the finite sample size effects diminish, and the correlation matrix case converges to the Dirac distribution behavior, confirming our theoretical prediction that correlation matrices behave as Dirac-distributed weights in the large sample limit.}
+    \label{fig:correlation_matrix}
+\end{figure}
+
+
+\end{document}

@@ -1,19 +1,37 @@
-# Talks template
+# Talk: Detectability Threshold in Weighted Modular Networks
 
-This repository contains a template for creating and organizing talks. It provides a structured format to help you prepare and present your ideas effectively.
+Slides and materials for talks on the detectability limit for community detection in weighted networks.
 
+## Paper
 
-## Structure 
+**Detectability threshold in weighted modular networks**
+Filippo Radicchi, Filipi N. Silva, Alessandro Flammini, Santo Fortunato, Sadamori Kojaku
 
-The template is organized into the following sections:
+*Physical Review E* — https://journals.aps.org/pre/abstract/10.1103/bt2h-b7kb
 
-- Black theme: `template/black-theme.key` 
-- White theme: `template/white-theme.key`
+### Abstract
 
-The figures and assets used in the slides are stored in the `assets` folder.
+We derive the detectability threshold for weighted networks using spectral modularity optimization on a weighted planted-partition model (PPM) with two equally sized communities. Our analysis reveals a general expression showing that the threshold depends on the first two moments of both node degree and edge weight distributions. Counterintuitively, edge weights can *undermine* community detection when they do not correlate with community structure. We compare five edge-weight distributions (Dirac, Poisson, exponential, geometric, signed Bernoulli) and validate theoretical predictions using the Leiden algorithm on multi-community networks.
 
-The memo and notes for the talks are stored in the `notes` folder.
+## Repository Structure
 
+```
+.
+├── assets/          # Images and assets for slides
+├── figs/            # Figures from the paper
+├── notes/           # Talk memos and preparation notes
+├── scripts/         # Analysis and figure generation scripts
+├── submitted/
+│   └── netsci2025/  # Abstract submitted to NetSci 2025
+├── template/        # Keynote slide templates (black/white themes)
+└── versions/        # LaTeX source versions of the paper
+```
+
+## Talks
+
+| Event | Date | Location |
+|-------|------|----------|
+| NetSci 2025 | 2025 | Maastricht, Netherlands |
 
 ## Talk Preparation Checklist
 
@@ -57,4 +75,4 @@ The memo and notes for the talks are stored in the `notes` folder.
 - LeeAundra Keany: http://thecontrarypublicspeaker.com/
 - Paul Edwards' notes: pne.people.si.umich.edu/PDF/howtotalk.pdf
 - [cs.princeton.edu/~smattw/AMW20/Workshop_GivingATalk.pdf](https://www.cs.princeton.edu/~smattw/AMW20/Workshop_GivingATalk.pdf)
-- [Slides - The Larremore Lab](https://larremorelab.github.io/slides/) 
+- [Slides - The Larremore Lab](https://larremorelab.github.io/slides/)
