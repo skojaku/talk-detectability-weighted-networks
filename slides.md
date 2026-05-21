@@ -64,7 +64,7 @@ style: |
 
 <!-- _class: title -->
 
-# The Cocktail Party Problem for Networks
+# The Stroop Effect for Networks
 
 ## When Correct Information Hurts Community Detection
 
@@ -77,15 +77,15 @@ NetSci 2026
 
 <!-- _class: title -->
 
-# A Cocktail Party
+# The Stroop Test
 
-*You can follow one conversation in a crowded room.*
+*Name the color of the ink, not the word.*
 
-*Now imagine a second voice, equally clear, speaking on an unrelated topic at the same volume.*
+*When the word "RED" is printed in red, you are fast.*
 
-*Comprehension collapses.*
+*When the word "RED" is printed in blue, you slow down.*
 
-*The second voice is not noise. It is signal you do not want.*
+*The word is not wrong. It is just irrelevant. And that is enough to break performance.*
 
 ---
 
@@ -99,7 +99,7 @@ Today I will show three things.
 - **Irrelevant weights** make detection harder. There is a tax.
 - **Ignoring irrelevant weights** can be mathematically optimal
 
-The second voice is not lying. It is just irrelevant. And that is enough to break detection.
+The word is not wrong. It is just irrelevant. And that is enough to break detection.
 
 ---
 
