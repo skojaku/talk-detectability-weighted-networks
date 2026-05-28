@@ -109,8 +109,9 @@ The word is not wrong. It is just irrelevant. And that is enough to break detect
 - Every weight is the **outcome of a measurement process**
 - Repeat the measurement. You get a different number.
 - A weight is not a fixed scalar. It is a **draw from a random variable**.
+- The mean is half the story. The **variance** is the other half.
 
-Which random variable? Does the choice matter for community detection?
+Same mean, different distributions. Does the choice matter for community detection?
 
 ---
 
