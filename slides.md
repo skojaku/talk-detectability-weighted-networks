@@ -111,7 +111,9 @@ The word is not wrong. It is just irrelevant. And that is enough to break detect
 - A weight is not a fixed scalar. It is a **draw from a random variable**.
 - The mean is half the story. The **variance** is the other half.
 
-Same mean, different distributions. Does the choice matter for community detection?
+![w:750 center](figs/distributions_same_mean.png)
+
+Same mean, different spread. Does the choice matter for community detection?
 
 ---
 
