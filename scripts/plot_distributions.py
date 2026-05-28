@@ -6,7 +6,7 @@ from scipy.stats import poisson, expon, geom
 
 W = 4  # common mean
 
-fig, ax = plt.subplots(1, 1, figsize=(8, 4))
+fig, ax = plt.subplots(1, 1, figsize=(5.6, 8))
 
 from scipy.special import gamma as gammafn
 
@@ -37,8 +37,8 @@ ax.plot(x_geom, pdf_geom, color="#e67e22", linewidth=2.5, label=f"Geometric ($\\
 # This only gives mean in [-1, 1]. Skip for this plot since W=4.
 
 ax.axvline(W, color="gray", linewidth=0.8, linestyle="--", alpha=0.5, zorder=1)
-ax.annotate(f"mean $= {W}$", xy=(W, ax.get_ylim()[1] if ax.get_ylim()[1] > 0 else 0.3),
-            xytext=(W + 1.5, 0.32), fontsize=14, color="gray",
+ax.annotate(f"mean $= {W}$", xy=(W, 0.25),
+            xytext=(W + 2, 0.28), fontsize=14, color="gray",
             arrowprops=dict(arrowstyle="->", color="gray", lw=1.2))
 
 ax.set_xlabel("Weight $w$", fontsize=16)
