@@ -14,20 +14,21 @@ x_disc = np.arange(0, 16)
 # Dirac delta at W
 ax.axvline(W, color="#e74c3c", linewidth=3, label=f"Dirac ($w = {W}$)", zorder=5)
 
-# Poisson (mean = W)
-pmf_poisson = poisson.pmf(x_disc, mu=W)
-ax.bar(x_disc, pmf_poisson, width=0.35, color="#2c3e50", alpha=0.7, label=f"Poisson ($\\mu = {W}$)", zorder=3)
+# Poisson (mean = W) — continuous interpolation
+from scipy.special import gamma as gammafn
+pdf_poisson = np.exp(x_cont * np.log(W) - W - np.log(gammafn(x_cont + 1)))
+ax.plot(x_cont, pdf_poisson, color="#2c3e50", linewidth=2.5, label=f"Poisson ($\\mu = {W}$)", zorder=3)
 
 # Exponential (mean = W)
 pdf_exp = expon.pdf(x_cont, scale=W)
 ax.plot(x_cont, pdf_exp, color="#2980b9", linewidth=2.5, label=f"Exponential ($\\mu = {W}$)", zorder=4)
 
-# Geometric (mean = W), supported on {1, 2, 3, ...}
-# Geometric with mean W: p = 1/W
+# Geometric (mean = W) — continuous interpolation
+# pmf: p(1-p)^{k-1} for k=1,2,...  → extend to continuous k
 p_geom = 1.0 / W
-x_geom = np.arange(1, 16)
-pmf_geom = geom.pmf(x_geom, p_geom)
-ax.bar(x_geom + 0.35, pmf_geom, width=0.35, color="#e67e22", alpha=0.7, label=f"Geometric ($\\mu = {W}$)", zorder=3)
+pdf_geom = p_geom * (1 - p_geom) ** (x_cont - 1)
+pdf_geom[x_cont < 1] = 0
+ax.plot(x_cont, pdf_geom, color="#e67e22", linewidth=2.5, label=f"Geometric ($\\mu = {W}$)", zorder=3)
 
 # Signed Bernoulli: w ∈ {-1, +1} with P(+1) = (W+1)/2, P(-1) = (1-W)/2...
 # Only works for |W| ≤ 1, so use W=0.5 variant or skip.
