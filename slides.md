@@ -103,6 +103,17 @@ The word is not wrong. It is just irrelevant. And that is enough to break detect
 
 ---
 
+# What Is an Edge Weight?
+
+- Passengers per year. Messages sent. Correlation over a time window. Dollars traded.
+- Every weight is the **outcome of a measurement process**
+- Repeat the measurement. You get a different number.
+- A weight is not a fixed scalar. It is a **draw from a random variable**.
+
+Which random variable? Does the choice matter for community detection?
+
+---
+
 # A Clean Benchmark: Two Scenarios
 
 Weighted Planted Partition Model. Two equal blocks.
