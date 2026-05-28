@@ -6,7 +6,7 @@ from scipy.stats import poisson, expon, geom
 
 W = 4  # common mean
 
-fig, ax = plt.subplots(1, 1, figsize=(5.6, 8))
+fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
 from scipy.special import gamma as gammafn
 
