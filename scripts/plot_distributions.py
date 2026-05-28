@@ -37,8 +37,8 @@ ax.plot(x_geom, pdf_geom, color="#e67e22", linewidth=4, label=f"Geometric ($\\mu
 # This only gives mean in [-1, 1]. Skip for this plot since W=4.
 
 ax.axvline(W, color="gray", linewidth=0.8, linestyle="--", alpha=0.5, zorder=1)
-ax.annotate(f"mean $= {W}$", xy=(W, 0.25),
-            xytext=(W + 2, 0.28), fontsize=20, color="gray",
+ax.annotate(f"mean $= {W}$", xy=(W, 0.18),
+            xytext=(W + 3, 0.18), fontsize=20, color="gray",
             arrowprops=dict(arrowstyle="->", color="gray", lw=1.5))
 
 ax.set_xlabel("Weight $w$", fontsize=22)
